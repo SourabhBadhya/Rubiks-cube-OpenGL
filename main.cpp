@@ -458,7 +458,7 @@ void draw_square(int color){
     
     
     glBegin(GL_QUADS);
-        // glNormal3f(0.0, 0.0, 1.0);
+        // glNormal3f(0.0, 1.0, 0.0);
         glVertex3f(-cube_size/6, cube_size/6, 0);
         glVertex3f(cube_size/6, cube_size/6, 0);
         glVertex3f(cube_size/6, -cube_size/6, 0);
@@ -467,11 +467,14 @@ void draw_square(int color){
 }
 
 void draw_face(int face){
-    GLdouble total_elevation = cube_size/2+gap+elevation;
 
-    glPushMatrix();
-
-    glTranslatef(0.0f, 0.0f, total_elevation);
+    // if(face == 0){
+    //     glPointSize(10);
+    //     glBegin(GL_POINTS);
+    //     glVertex3f(10.0,0.0,15.0);
+    //     glEnd();
+    //     glPointSize(1);
+    // }
 
     for(int i=0; i<3; i++){
         glPushMatrix();
@@ -488,8 +491,6 @@ void draw_face(int face){
 
         glPopMatrix();
     }
-
-    glPopMatrix();
 }
 
 void draw_cube(){
@@ -502,30 +503,46 @@ void draw_cube(){
     // set camera position
     set_camera();
 
+    // glTranslatef(30.0f, 30.0f, 0.0f);
+
+    GLdouble total_elevation = cube_size/2+gap+elevation;
+
     for(int i=0; i<6; i++){
         if(i == 0){ // Top face
             glPushMatrix();
-
-            glRotatef(-90, 1.0, 0.0, 0.0);
+            
+            glRotatef(90, 1.0, 0.0, 0.0);
+            glTranslatef(0.0, 0, -total_elevation);
+            glRotatef(180, 0.0, 0.0, 1);
             draw_face(i);
 
             glPopMatrix();
         } else if(i == 1){ // Front face
-            //No rotation required
+            glPushMatrix();
 
+            glTranslatef(0.0, 0.0, total_elevation);
+            glRotatef(180, 0, 1, 0);
             draw_face(i);
+
+            glPopMatrix();
         } else if(i == 2){
             glPushMatrix();
 
-            glRotatef(-180, 1.0, 0.0, 0.0);
+            glTranslatef(0.0, 0.0, -total_elevation);
+            glRotatef(180, 0.0, 0.0, 1.0);
             draw_face(i);
 
             glPopMatrix();
         } else if(i == 3){
             glPushMatrix();
 
-            glRotatef(-90, 1.0, 0.0, 0.0);
+
+
+            glTranslatef(total_elevation, 0.0, 0.0);
+
             glRotatef(90, 0.0, 1.0, 0.0);
+            glRotatef(90, 0.0, 0.0, 1);
+            glRotatef(180, 1, 0, 0);
 
             draw_face(i);
 
@@ -533,8 +550,12 @@ void draw_cube(){
         } else if(i == 4){
             glPushMatrix();
 
-            glRotatef(-90, 1.0, 0.0, 0.0);
-            glRotatef(-90, 0.0, 1.0, 0.0);
+            glTranslatef(-total_elevation, 0.0, 0.0);
+
+            glRotatef(90, 0.0, 1.0, 0.0);
+            glRotatef(90, 0.0, 0.0, 1);
+            glRotatef(180, 1, 0, 0);
+            glRotatef(180, 0, 1, 0);
 
             draw_face(i);
 
@@ -542,8 +563,12 @@ void draw_cube(){
         } else{
             glPushMatrix();
 
-            glRotatef(-90, 1.0, 0.0, 0.0);
-            glRotatef(180, 0.0, 1.0, 0.0);
+            glTranslatef(0.0, -total_elevation, 0);
+            
+            glRotatef(90, 1.0, 0.0, 0.0);
+            
+            glRotatef(180, 0.0, 0.0, 1);
+            glRotatef(180, 0, 1, 0);
 
             draw_face(i);
 
@@ -567,6 +592,7 @@ void draw_cube(){
 
     // glPopMatrix();
 
+    glutPostRedisplay();
 
     glutSwapBuffers();
 }
@@ -591,7 +617,7 @@ void load_visualization_parameters(void)
 void init(){
     angle = 45;
     gap = 2;
-    elevation = 5;
+    elevation = 2;
     cube_size = 30;
 
     GLfloat ambient_lighte[4]={0.2,0.2,0.2,1.0}; 
@@ -646,18 +672,96 @@ void reshape_func(GLsizei w, GLsizei h)
     load_visualization_parameters();
 }
 
-void keyboardCallback(){
+void keyboardCallback(unsigned char key, int x, int y){
+    switch(key){
+        case 'a' :
+            RubiksCube.rotateYinverted();
+            break;
 
+        case ';' :
+            RubiksCube.rotateY();
+            break;
+        
+        case 'q' :
+            RubiksCube.rotateZinverted();
+            break;
+        
+        case 'p' :
+            RubiksCube.rotateZ();
+            break;
+        
+        case 'w' :
+            RubiksCube.rotateB();
+            break;
+        
+        case 'o' :
+            RubiksCube.rotateBinverted();
+            break;
+        
+        case 'i' :
+            RubiksCube.rotateR();
+            break;
+        
+        case  'k' :
+            RubiksCube.rotateRinverted();
+            break;
+
+        case 'e' :
+            RubiksCube.rotateLinverted();
+            break;
+
+        case 'd' :
+            RubiksCube.rotateL();
+            break;
+        
+        case 'j' :
+            RubiksCube.rotateU();
+            break;
+
+        case 'f' :
+            RubiksCube.rotateUinverted();
+            break;
+
+        case 'h' :
+            RubiksCube.rotateF();
+            break;
+        
+        case 'g' :
+            RubiksCube.rotateFinverted();
+            break;
+        
+        case 't' :
+            RubiksCube.rotateX();
+            break;
+        
+        case 'v' :
+            RubiksCube.rotateXinverted();
+            break;
+
+        case 's' :
+            RubiksCube.rotateD();
+            break;
+        
+        case 'l' :
+            RubiksCube.rotateDinverted();
+            break;
+        
+        case 'b' :
+            RubiksCube.rotateMinverted();
+            break;
+        
+        case 'n' :
+            RubiksCube.rotateM();
+            break;
+        
+        default:
+            break;
+    }
+
+    
 }
 
 int main(int argc, char **argv){
-    
-
-    // MyCube.rotateZinverted();
-    // MyCube.draw_cube();
-
-    RubiksCube.rotateD();
-    // RubiksCube.draw_cube();
 
     glutInit(&argc,argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -666,7 +770,7 @@ int main(int argc, char **argv){
 	glutCreateWindow("Rubik's cube simulation");
 	glutDisplayFunc(draw_cube);
     glutReshapeFunc(reshape_func);
-    // glutSpecialFunc(keyboardCallback);
+    glutKeyboardFunc(keyboardCallback);
 	init();
 	glutMainLoop();
 }
