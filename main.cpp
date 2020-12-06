@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include<GL/glut.h>
 using namespace std;
 
 const int WHITE = 0;
@@ -417,9 +418,255 @@ struct cube{
     }
 };
 
-int main(){
-    cube MyCube;
 
-    MyCube.rotateZinverted();
-    MyCube.draw_cube();
+GLfloat angle, fAspect, gap, elevation, cube_size;
+
+
+cube RubiksCube;
+
+void set_camera(){
+    gluLookAt(0,90,150, 0,0,0, 0,1,0);
+}
+
+void draw_square(int color){
+
+    switch(color){
+        case 0 : glColor3f(1.0f, 1.0f, 1.0f);
+            break;
+        
+        case 1 : 
+            glColor3f(0.0f, 1.0f, 0.0f);
+            break;
+
+        case 2 : 
+            glColor3f(0.0f, 0.0f, 1.0f);
+            break;
+
+        case 3 :
+            glColor3f(1.0f, 0.0f, 0.0f);
+            break;
+
+        case 4 :
+            glColor3f(1.0f, 0.5f, 0.0f);
+            break;
+
+        case 5 :
+            glColor3f(1.0f, 1.0f, 0.0f);
+            break;
+    }
+
+    
+    
+    glBegin(GL_QUADS);
+        // glNormal3f(0.0, 0.0, 1.0);
+        glVertex3f(-cube_size/6, cube_size/6, 0);
+        glVertex3f(cube_size/6, cube_size/6, 0);
+        glVertex3f(cube_size/6, -cube_size/6, 0);
+        glVertex3f(-cube_size/6, -cube_size/6, 0);
+    glEnd();
+}
+
+void draw_face(int face){
+    GLdouble total_elevation = cube_size/2+gap+elevation;
+
+    glPushMatrix();
+
+    glTranslatef(0.0f, 0.0f, total_elevation);
+
+    for(int i=0; i<3; i++){
+        glPushMatrix();
+        glTranslatef(0.0f, (cube_size/3+gap)*(1-i), 0.0f);
+        for(int j=0; j<3; j++){
+            glPushMatrix();
+
+            glTranslatef((cube_size/3+gap)*(1-j), 0.0f, 0.0f);
+
+            draw_square(RubiksCube.faces[face][i][j]);
+
+            glPopMatrix();
+        }
+
+        glPopMatrix();
+    }
+
+    glPopMatrix();
+}
+
+void draw_cube(){
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // reset transformations
+    glLoadIdentity();
+
+    // set camera position
+    set_camera();
+
+    for(int i=0; i<6; i++){
+        if(i == 0){ // Top face
+            glPushMatrix();
+
+            glRotatef(-90, 1.0, 0.0, 0.0);
+            draw_face(i);
+
+            glPopMatrix();
+        } else if(i == 1){ // Front face
+            //No rotation required
+
+            draw_face(i);
+        } else if(i == 2){
+            glPushMatrix();
+
+            glRotatef(-180, 1.0, 0.0, 0.0);
+            draw_face(i);
+
+            glPopMatrix();
+        } else if(i == 3){
+            glPushMatrix();
+
+            glRotatef(-90, 1.0, 0.0, 0.0);
+            glRotatef(90, 0.0, 1.0, 0.0);
+
+            draw_face(i);
+
+            glPopMatrix();
+        } else if(i == 4){
+            glPushMatrix();
+
+            glRotatef(-90, 1.0, 0.0, 0.0);
+            glRotatef(-90, 0.0, 1.0, 0.0);
+
+            draw_face(i);
+
+            glPopMatrix();
+        } else{
+            glPushMatrix();
+
+            glRotatef(-90, 1.0, 0.0, 0.0);
+            glRotatef(180, 0.0, 1.0, 0.0);
+
+            draw_face(i);
+
+            glPopMatrix();
+        }
+    }
+
+    // glClearColor(0.0,0.0,0.0,0.0);
+
+    
+
+    // draw_square(1);
+
+    // glPushMatrix();
+
+    // glTranslatef(0,20,0);
+    // // glRotatef(90, 1.0, 0.0, 0.0);
+
+    // glColor3f(1.0f, 0.0f, 1.0f);
+    // draw_square(1);
+
+    // glPopMatrix();
+
+
+    glutSwapBuffers();
+}
+
+void load_visualization_parameters(void)
+{
+    // specify projection coordinate system
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    // specify projection perspective
+    gluPerspective(angle,fAspect,0.4,500);
+
+    // init model coordinate system
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    // specify observer and target positions
+    set_camera();
+} // load visualization parameters
+
+void init(){
+    angle = 45;
+    gap = 2;
+    elevation = 5;
+    cube_size = 30;
+
+    GLfloat ambient_lighte[4]={0.2,0.2,0.2,1.0}; 
+    GLfloat diffuse_light[4]={0.7,0.7,0.7,1.0};		// color
+    GLfloat specular_light[4]={1.0, 1.0, 1.0, 1.0};	// brightness
+    GLfloat light_position[4]={0.0, 50.0, 50.0, 1.0};
+
+    // material brightness capacity
+    GLfloat specularity[4]={1.0,1.0,1.0,1.0}; 
+    GLint material_specularity = 60;
+
+    // black background
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    
+    // // Gouraud colorization model
+    // glShadeModel(GL_SMOOTH);
+
+    // // material reflectability
+    // glMaterialfv(GL_FRONT,GL_SPECULAR, specularity);
+    // // brightness concentration
+    // glMateriali(GL_FRONT,GL_SHININESS,material_specularity);
+
+    // // activate ambient light
+    // glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient_lighte);
+
+    // // define light parameters
+    // glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_lighte); 
+    // glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light );
+    // glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light );
+    // glLightfv(GL_LIGHT0, GL_POSITION, light_position );
+
+    // // enable changing material color
+    // glEnable(GL_COLOR_MATERIAL);
+    // // enable lighting
+    // glEnable(GL_LIGHTING);
+    // glEnable(GL_LIGHT0);
+    // // enable depth buffering
+    glEnable(GL_DEPTH_TEST);
+}
+
+void reshape_func(GLsizei w, GLsizei h)
+{
+    // prevents division by zero
+    if ( h == 0 ) h = 1;
+
+    // viewport size
+    glViewport(0, 0, w, h);
+
+    // aspect ratio
+    fAspect = (GLfloat)w/(GLfloat)h;
+
+    load_visualization_parameters();
+}
+
+void keyboardCallback(){
+
+}
+
+int main(int argc, char **argv){
+    
+
+    // MyCube.rotateZinverted();
+    // MyCube.draw_cube();
+
+    RubiksCube.rotateD();
+    // RubiksCube.draw_cube();
+
+    glutInit(&argc,argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitWindowSize(500,500);
+	glutInitWindowPosition(100,100);
+	glutCreateWindow("Rubik's cube simulation");
+	glutDisplayFunc(draw_cube);
+    glutReshapeFunc(reshape_func);
+    // glutSpecialFunc(keyboardCallback);
+	init();
+	glutMainLoop();
 }
