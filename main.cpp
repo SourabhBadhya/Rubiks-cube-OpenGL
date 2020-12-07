@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include<unistd.h>
 #include<GL/glut.h>
 using namespace std;
 
@@ -425,7 +426,7 @@ GLfloat angle, fAspect, gap, elevation, cube_size;
 cube RubiksCube;
 
 void set_camera(){
-    gluLookAt(0,90,150, 0,0,0, 0,1,0);
+    gluLookAt(0,80,100, 0,-cube_size/2,-cube_size/2, 0,1,0);
 }
 
 void draw_square(int color){
@@ -458,7 +459,6 @@ void draw_square(int color){
     
     
     glBegin(GL_QUADS);
-        // glNormal3f(0.0, 1.0, 0.0);
         glVertex3f(-cube_size/6, cube_size/6, 0);
         glVertex3f(cube_size/6, cube_size/6, 0);
         glVertex3f(cube_size/6, -cube_size/6, 0);
@@ -467,14 +467,6 @@ void draw_square(int color){
 }
 
 void draw_face(int face){
-
-    // if(face == 0){
-    //     glPointSize(10);
-    //     glBegin(GL_POINTS);
-    //     glVertex3f(10.0,0.0,15.0);
-    //     glEnd();
-    //     glPointSize(1);
-    // }
 
     for(int i=0; i<3; i++){
         glPushMatrix();
@@ -557,6 +549,9 @@ void draw_cube(){
             glRotatef(180, 1, 0, 0);
             glRotatef(180, 0, 1, 0);
 
+            // glRotatef(-90, 0, 1, 0);
+            // glRotatef(90, 0, 0, 1);
+
             draw_face(i);
 
             glPopMatrix();
@@ -576,22 +571,6 @@ void draw_cube(){
         }
     }
 
-    // glClearColor(0.0,0.0,0.0,0.0);
-
-    
-
-    // draw_square(1);
-
-    // glPushMatrix();
-
-    // glTranslatef(0,20,0);
-    // // glRotatef(90, 1.0, 0.0, 0.0);
-
-    // glColor3f(1.0f, 0.0f, 1.0f);
-    // draw_square(1);
-
-    // glPopMatrix();
-
     glutPostRedisplay();
 
     glutSwapBuffers();
@@ -604,7 +583,7 @@ void load_visualization_parameters(void)
     glLoadIdentity();
 
     // specify projection perspective
-    gluPerspective(angle,fAspect,0.4,500);
+    gluPerspective(angle,fAspect,1,500);
 
     // init model coordinate system
     glMatrixMode(GL_MODELVIEW);
@@ -615,46 +594,11 @@ void load_visualization_parameters(void)
 } // load visualization parameters
 
 void init(){
-    angle = 45;
-    gap = 2;
-    elevation = 2;
+    angle = 50;
+    gap = 5;
+    elevation = 1;
     cube_size = 30;
 
-    GLfloat ambient_lighte[4]={0.2,0.2,0.2,1.0}; 
-    GLfloat diffuse_light[4]={0.7,0.7,0.7,1.0};		// color
-    GLfloat specular_light[4]={1.0, 1.0, 1.0, 1.0};	// brightness
-    GLfloat light_position[4]={0.0, 50.0, 50.0, 1.0};
-
-    // material brightness capacity
-    GLfloat specularity[4]={1.0,1.0,1.0,1.0}; 
-    GLint material_specularity = 60;
-
-    // black background
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    
-    // // Gouraud colorization model
-    // glShadeModel(GL_SMOOTH);
-
-    // // material reflectability
-    // glMaterialfv(GL_FRONT,GL_SPECULAR, specularity);
-    // // brightness concentration
-    // glMateriali(GL_FRONT,GL_SHININESS,material_specularity);
-
-    // // activate ambient light
-    // glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient_lighte);
-
-    // // define light parameters
-    // glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_lighte); 
-    // glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light );
-    // glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light );
-    // glLightfv(GL_LIGHT0, GL_POSITION, light_position );
-
-    // // enable changing material color
-    // glEnable(GL_COLOR_MATERIAL);
-    // // enable lighting
-    // glEnable(GL_LIGHTING);
-    // glEnable(GL_LIGHT0);
-    // // enable depth buffering
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -702,7 +646,7 @@ void keyboardCallback(unsigned char key, int x, int y){
             RubiksCube.rotateR();
             break;
         
-        case  'k' :
+        case 'k' :
             RubiksCube.rotateRinverted();
             break;
 
@@ -751,6 +695,26 @@ void keyboardCallback(unsigned char key, int x, int y){
             break;
         
         case 'n' :
+            RubiksCube.rotateM();
+            break;
+        
+        case 'I' :
+            RubiksCube.rotateR();
+            RubiksCube.rotateMinverted();
+            break;
+        
+        case 'K' :
+            RubiksCube.rotateRinverted();
+            RubiksCube.rotateM();
+            break;
+
+        case 'E' :
+            RubiksCube.rotateLinverted();
+            RubiksCube.rotateMinverted();
+            break;
+        
+        case 'D' :
+            RubiksCube.rotateL();
             RubiksCube.rotateM();
             break;
         
