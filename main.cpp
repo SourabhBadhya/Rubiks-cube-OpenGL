@@ -420,7 +420,7 @@ struct cube{
 };
 
 
-GLfloat angle, fAspect, gap, elevation, cube_size;
+GLfloat angle, aspect_ratio, gap, elevation, cube_size;
 
 
 cube RubiksCube;
@@ -432,26 +432,26 @@ void set_camera(){
 void draw_square(int color){
 
     switch(color){
-        case 0 : glColor3f(1.0f, 1.0f, 1.0f);
+        case WHITE : glColor3f(1.0f, 1.0f, 1.0f);
             break;
         
-        case 1 : 
+        case GREEN : 
             glColor3f(0.0f, 1.0f, 0.0f);
             break;
 
-        case 2 : 
+        case BLUE : 
             glColor3f(0.0f, 0.0f, 1.0f);
             break;
 
-        case 3 :
+        case RED :
             glColor3f(1.0f, 0.0f, 0.0f);
             break;
 
-        case 4 :
+        case ORANGE :
             glColor3f(1.0f, 0.5f, 0.0f);
             break;
 
-        case 5 :
+        case YELLOW :
             glColor3f(1.0f, 1.0f, 0.0f);
             break;
     }
@@ -474,7 +474,7 @@ void draw_face(int face){
         for(int j=0; j<3; j++){
             glPushMatrix();
 
-            glTranslatef((cube_size/3+gap)*(1-j), 0.0f, 0.0f);
+            glTranslatef((cube_size/3+gap)*(j-1), 0.0f, 0.0f);
 
             draw_square(RubiksCube.faces[face][i][j]);
 
@@ -489,80 +489,61 @@ void draw_cube(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // reset transformations
     glLoadIdentity();
 
-    // set camera position
     set_camera();
-
-    // glTranslatef(30.0f, 30.0f, 0.0f);
 
     GLdouble total_elevation = cube_size/2+gap+elevation;
 
     for(int i=0; i<6; i++){
         if(i == 0){ // Top face
             glPushMatrix();
-            
-            glRotatef(90, 1.0, 0.0, 0.0);
-            glTranslatef(0.0, 0, -total_elevation);
-            glRotatef(180, 0.0, 0.0, 1);
+
+            glTranslatef(0, total_elevation, 0);
+            glRotatef(-90, 1, 0, 0);
             draw_face(i);
 
             glPopMatrix();
         } else if(i == 1){ // Front face
             glPushMatrix();
 
-            glTranslatef(0.0, 0.0, total_elevation);
-            glRotatef(180, 0, 1, 0);
+            glTranslatef(0, 0, total_elevation);
             draw_face(i);
 
             glPopMatrix();
-        } else if(i == 2){
+        } else if(i == 2){ // Back face
             glPushMatrix();
 
-            glTranslatef(0.0, 0.0, -total_elevation);
-            glRotatef(180, 0.0, 0.0, 1.0);
-            draw_face(i);
-
-            glPopMatrix();
-        } else if(i == 3){
-            glPushMatrix();
-
-
-
-            glTranslatef(total_elevation, 0.0, 0.0);
-
-            glRotatef(90, 0.0, 1.0, 0.0);
-            glRotatef(90, 0.0, 0.0, 1);
+            glTranslatef(0, 0, -total_elevation);
             glRotatef(180, 1, 0, 0);
+            draw_face(i);
+
+            glPopMatrix();
+        } else if(i == 3){ // Right face
+            glPushMatrix();
+
+            glTranslatef(total_elevation, 0, 0);
+            glRotatef(90, 0, 1, 0);
+            glRotatef(-90, 0, 0, 1);
 
             draw_face(i);
 
             glPopMatrix();
-        } else if(i == 4){
+        } else if(i == 4){ // Left face 
             glPushMatrix();
 
             glTranslatef(-total_elevation, 0.0, 0.0);
-
-            glRotatef(90, 0.0, 1.0, 0.0);
-            glRotatef(90, 0.0, 0.0, 1);
-            glRotatef(180, 1, 0, 0);
-            glRotatef(180, 0, 1, 0);
-
-            // glRotatef(-90, 0, 1, 0);
-            // glRotatef(90, 0, 0, 1);
+            glRotatef(-90, 0, 1, 0);
+            glRotatef(90, 0, 0, 1);
 
             draw_face(i);
 
             glPopMatrix();
-        } else{
+        } else{ // Bottom face
             glPushMatrix();
 
             glTranslatef(0.0, -total_elevation, 0);
-            
-            glRotatef(90, 1.0, 0.0, 0.0);
-            
-            glRotatef(180, 0.0, 0.0, 1);
+            glRotatef(-90, 1, 0, 0);
             glRotatef(180, 0, 1, 0);
 
             draw_face(i);
@@ -578,20 +559,16 @@ void draw_cube(){
 
 void load_visualization_parameters(void)
 {
-    // specify projection coordinate system
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    // specify projection perspective
-    gluPerspective(angle,fAspect,1,500);
+    gluPerspective(angle,aspect_ratio,1,500);
 
-    // init model coordinate system
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // specify observer and target positions
     set_camera();
-} // load visualization parameters
+}
 
 void init(){
     angle = 50;
@@ -602,16 +579,12 @@ void init(){
     glEnable(GL_DEPTH_TEST);
 }
 
-void reshape_func(GLsizei w, GLsizei h)
-{
-    // prevents division by zero
+void reshape_func(GLsizei w, GLsizei h){
     if ( h == 0 ) h = 1;
 
-    // viewport size
     glViewport(0, 0, w, h);
 
-    // aspect ratio
-    fAspect = (GLfloat)w/(GLfloat)h;
+    aspect_ratio = (GLfloat)w/(GLfloat)h;
 
     load_visualization_parameters();
 }
