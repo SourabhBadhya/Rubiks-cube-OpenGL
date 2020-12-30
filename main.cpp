@@ -485,13 +485,12 @@ void draw_face(int face){
     }
 }
 
+
+
 void draw_cube(){
+    
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glLoadIdentity();
-
-    set_camera();
+    
 
     GLdouble total_elevation = cube_size/2+gap+elevation;
 
@@ -557,6 +556,43 @@ void draw_cube(){
     glutSwapBuffers();
 }
 
+void draw_cube2(){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glLoadIdentity();
+
+    
+
+    set_camera();
+
+    string by = "By";
+    string sourabh = "Sourabh S Badhya (1RV17CS159)";
+    string sparsh = "Sparsh G Sarode (1RV17CS162)";
+
+    glColor3f(1.0,1.0,0);
+
+
+    glRasterPos2f(50,50);
+
+    for(int i=0; i<by.size(); i++){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,by[i]);
+    }
+
+    glRasterPos2f(52,45);
+
+    for(int i=0; i<sparsh.size(); i++){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,sparsh[i]);
+    }
+
+    glRasterPos2f(54,40);
+
+    for(int i=0; i<sourabh.size(); i++){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,sourabh[i]);
+    }
+
+    draw_cube();
+}
+
 void load_visualization_parameters(void)
 {
     glMatrixMode(GL_PROJECTION);
@@ -577,6 +613,10 @@ void init(){
     cube_size = 30;
 
     glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_POLYGON_SMOOTH);
+    glEnable(GL_BLEND);
 }
 
 void reshape_func(GLsizei w, GLsizei h){
@@ -701,13 +741,13 @@ void keyboardCallback(unsigned char key, int x, int y){
 int main(int argc, char **argv){
 
     glutInit(&argc,argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(500,500);
-	glutInitWindowPosition(100,100);
-	glutCreateWindow("Rubik's cube simulation");
-	glutDisplayFunc(draw_cube);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(500,500);
+    glutInitWindowPosition(100,100);
+    glutCreateWindow("Rubik's cube simulation");
+    glutDisplayFunc(draw_cube2);
     glutReshapeFunc(reshape_func);
     glutKeyboardFunc(keyboardCallback);
-	init();
-	glutMainLoop();
+    init();
+    glutMainLoop();
 }
